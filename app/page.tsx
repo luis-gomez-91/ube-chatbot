@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Trash2, Bot, Moon, Sun } from 'lucide-react';
-import Image from "next/image";
+import { Send, Bot, Moon, Sun, MessageSquare } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import remarkGfm from 'remark-gfm';
 
@@ -42,12 +41,14 @@ export default function Home() {
       setIsDarkMode(prefersDark);
     }
 
-    setMessages([{
-      id: 'welcome',
-      text: '¡Hola! Soy tu asistente de IA. ¿En qué puedo ayudarte hoy?',
-      sender: 'bot',
-      timestamp: new Date()
-    }]);
+    setMessages([
+      // {
+      //   id: 'welcome',
+      //   text: '¡Hola! Soy tu asistente de IA. ¿En qué puedo ayudarte hoy?',
+      //   sender: 'bot',
+      //   timestamp: new Date()
+      // }
+    ]);
   }, []);
 
   // Save theme preference
@@ -68,7 +69,7 @@ export default function Home() {
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
     }
   }, [inputValue]);
 
@@ -96,7 +97,6 @@ export default function Home() {
     try {
       console.log('Enviando mensaje a API proxy...');
       
-      // Use local API route instead of direct call to Railway
       const response = await fetch(`/api/chat?user_id=luis`, {
         method: 'POST',
         headers: { 
@@ -138,7 +138,6 @@ export default function Home() {
       
       let errorText = 'Error al comunicarse con el servidor. Por favor, intenta nuevamente.';
       
-      // More specific error messages
       if (error instanceof TypeError && error.message.includes('fetch')) {
         errorText = 'Error de conexión. Verifica tu conexión a internet.';
       } else if (error instanceof Error) {
@@ -171,88 +170,55 @@ export default function Home() {
     }
   };
 
-  const clearChat = () => {
-    setMessages([{
-      id: 'welcome',
-      text: '¡Hola! Soy tu asistente de IA. ¿En qué puedo ayudarte hoy?',
-      sender: 'bot',
-      timestamp: new Date()
-    }]);
-  };
-
   // Theme-based styles
   const themeClasses = {
-    container: isDarkMode 
-      ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-100'
-      : 'bg-gradient-to-br from-slate-50 via-white to-slate-100 text-slate-900',
+    sidebar: isDarkMode 
+      ? 'bg-slate-900 border-slate-700'
+      : 'bg-slate-50 border-slate-200',
     
-    chatContainer: isDarkMode
-      ? 'bg-slate-800/80 backdrop-blur-sm border-slate-700 shadow-slate-900/50'
-      : 'bg-white/90 backdrop-blur-sm border-slate-200 shadow-slate-300/30',
+    mainArea: isDarkMode
+      ? 'bg-slate-800'
+      : 'bg-white',
     
-    header: isDarkMode
-      ? 'bg-gradient-to-r from-red-600 to-red-700 text-white'
-      : 'bg-gradient-to-r from-red-500 to-red-600 text-white',
+    sidebarText: isDarkMode
+      ? 'text-slate-100'
+      : 'text-slate-900',
     
-    headerButton: isDarkMode
-      ? 'bg-white/20 hover:bg-white/30 focus:ring-white/50'
-      : 'bg-white/20 hover:bg-white/30 focus:ring-white/50',
-    
-    messagesArea: isDarkMode
-      ? 'bg-slate-900/50'
-      : 'bg-slate-50/50',
-    
-    userMessage: isDarkMode
-      ? 'bg-slate-800 text-slate-100 border-slate-500/50'
-      : 'bg-slate-100 text-slate-900 border-slate-300/50',
-    
-    botMessage: isDarkMode
-      ? 'bg-slate-700/80 text-slate-100 border-slate-600/50'
-      : 'bg-white text-slate-900 border-slate-200/50',
-    
-    userAvatar: isDarkMode
-      ? 'bg-slate-600 text-slate-100'
-      : 'bg-slate-300 text-slate-800',
-    
-    botAvatar: isDarkMode
-      ? 'bg-gradient-to-br from-red-500 to-red-600 text-white'
-      : 'bg-gradient-to-br from-red-400 to-red-500 text-white',
-    
-    timestamp: isDarkMode
-      ? 'text-slate-400'
-      : 'text-slate-500',
-    
-    inputArea: isDarkMode
-      ? 'bg-slate-800/90 backdrop-blur-sm border-slate-700'
-      : 'bg-white/90 backdrop-blur-sm border-slate-200',
-    
-    textarea: isDarkMode
-      ? 'border-slate-600 focus:ring-red-500 focus:border-red-500 bg-slate-700/80 text-slate-100 placeholder-slate-400'
-      : 'border-slate-300 focus:ring-red-500 focus:border-red-500 bg-white text-slate-900 placeholder-slate-500',
-    
-    sendButton: isDarkMode
-      ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 disabled:from-slate-600 disabled:to-slate-500'
-      : 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 disabled:from-slate-400 disabled:to-slate-500',
-    
-    loadingText: isDarkMode
-      ? 'text-slate-400'
-      : 'text-slate-500',
-    
-    helpText: isDarkMode
-      ? 'text-slate-400'
-      : 'text-slate-500',
-    
-    subtitle: isDarkMode
+    sidebarSecondary: isDarkMode
       ? 'text-slate-400'
       : 'text-slate-600',
+    
+    themeButton: isDarkMode
+      ? 'hover:bg-slate-800 text-slate-300 hover:text-slate-100'
+      : 'hover:bg-slate-200 text-slate-600 hover:text-slate-900',
+    
+    messageContainer: isDarkMode
+      ? 'hover:bg-slate-700/50'
+      : 'hover:bg-slate-50',
+    
+    userMessage: isDarkMode
+      ? 'bg-slate-600 text-slate-100'
+      : 'bg-slate-200 text-slate-900',
+    
+    botMessage: isDarkMode
+      ? 'text-slate-100'
+      : 'text-slate-900',
+    
+    inputArea: isDarkMode
+      ? 'bg-slate-700 border-slate-600 text-slate-100 placeholder-slate-400'
+      : 'bg-white border-slate-300 text-slate-900 placeholder-slate-500',
+    
+    sendButton: isDarkMode
+      ? 'bg-slate-600 hover:bg-slate-500 text-slate-100'
+      : 'bg-slate-600 hover:bg-slate-700 text-white',
 
     // Markdown styles
     markdown: {
       code: isDarkMode
-        ? 'bg-slate-600 text-slate-100'
+        ? 'bg-slate-700 text-slate-100'
         : 'bg-slate-200 text-slate-800',
       pre: isDarkMode
-        ? 'bg-slate-600 text-slate-100'
+        ? 'bg-slate-700 text-slate-100'
         : 'bg-slate-200 text-slate-800',
       strong: isDarkMode
         ? 'text-slate-50'
@@ -267,232 +233,184 @@ export default function Home() {
         ? 'border-slate-500 text-slate-300'
         : 'border-slate-300 text-slate-600',
       link: isDarkMode
-        ? 'text-red-400 hover:text-red-300'
-        : 'text-red-600 hover:text-red-500',
+        ? 'text-blue-400 hover:text-blue-300'
+        : 'text-blue-600 hover:text-blue-500',
     }
   };
 
   if (!isClient) {
     return (
-      <div className={`h-screen flex items-center justify-center ${themeClasses.container}`}>
+      <div className={`h-screen flex items-center justify-center ${isDarkMode ? 'bg-slate-800' : 'bg-white'}`}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto mb-4"></div>
-          <p>Cargando...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600 mx-auto mb-4"></div>
+          <p className={isDarkMode ? 'text-slate-300' : 'text-slate-700'}>Cargando...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={`h-screen ${themeClasses.container} flex flex-col transition-colors duration-300`}>
-      <div className="container mx-auto px-4 py-8 flex flex-col h-full max-w-6xl">
-        {/* Hero Section */}
-        <div className="text-center mb-6 flex-shrink-0">
-          <div className="flex items-center justify-center space-x-4 mb-4">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-red-400 to-red-500 bg-clip-text text-transparent">
-              Asistente IA Inteligente
-            </h1>
-            <button
-              onClick={toggleTheme}
-              className={`p-3 rounded-full ${themeClasses.headerButton} transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500/50`}
-              title={isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-              aria-label={isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-            >
-              {isDarkMode ? (
-                <Sun className="w-6 h-6 text-yellow-400" />
-              ) : (
-                <Moon className="w-6 h-6 text-slate-600" />
-              )}
-            </button>
-          </div>
-          <p className={`text-sm ${themeClasses.subtitle} mb-6`}>
-            Conversa con nuestra IA avanzada y obtén respuestas instantáneas
-          </p>
-        </div>
-
-        {/* Chat Container */}
-        <div className="flex-1 flex flex-col w-full min-h-0">
-          <div className={`${themeClasses.chatContainer} rounded-lg shadow-2xl overflow-hidden border flex flex-col h-full transition-all duration-300`}>
-            {/* Chat Header */}
-            <div className={`${themeClasses.header} p-4 flex-shrink-0`}>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-lg">
-                    <Image
-                      src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Universidad_Bolivariana_del_Ecuador_logo_1.svg/1024px-Universidad_Bolivariana_del_Ecuador_logo_1.svg.png"
-                      alt="Logo de la UBE"
-                      width={30}
-                      height={30}
-                      className="object-contain object-center"
-                      priority
-                    />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold">Asistente IA</h3>
-                    <p className="text-sm text-red-100">
-                      {isLoading ? 'Escribiendo...' : 'En línea'}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={clearChat}
-                  className={`flex items-center space-x-2 ${themeClasses.headerButton} px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2`}
-                  title="Limpiar conversación"
-                  aria-label="Limpiar conversación"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  <span className="text-sm hidden sm:inline">Limpiar</span>
-                </button>
-              </div>
+    <div className="flex h-screen">
+      {/* Sidebar */}
+      <div className={`w-64 ${themeClasses.sidebar} border-r flex flex-col transition-colors duration-300`}>
+        {/* Header */}
+        <div className="p-6 border-b border-inherit">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-red-600 rounded-lg flex items-center justify-center">
+              <Bot className="w-5 h-5 text-white" />
             </div>
-
-            {/* Messages Area */}
-            <div className={`flex-1 overflow-y-auto p-4 space-y-4 ${themeClasses.messagesArea} min-h-0 transition-colors duration-300`}>
-              {!isClient ? (
-                <div className={`flex items-center justify-center h-full ${themeClasses.loadingText}`}>
-                  <p>Cargando...</p>
-                </div>
-              ) : messages.length === 0 ? (
-                <div className={`flex items-center justify-center h-full ${themeClasses.loadingText}`}>
-                  <p>No hay mensajes aún</p>
-                </div>
-              ) : (
-                messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex items-start space-x-3 animate-fade-in ${
-                      message.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''
-                    }`}
-                  >
-                    <div
-                      className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-lg ${
-                        message.sender === 'user'
-                          ? themeClasses.userAvatar
-                          : themeClasses.botAvatar
-                      }`}
-                    >
-                      {message.sender === 'user' ? (
-                        <span className="text-xs font-bold">
-                          {message.name?.charAt(0).toUpperCase() || 'U'}
-                        </span>
-                      ) : (
-                        <Bot className="w-4 h-4" />
-                      )}
-                    </div>
-
-                    <div
-                      className={`max-w-xs sm:max-w-md lg:max-w-2xl ${
-                        message.sender === 'user' ? 'text-right' : 'text-left'
-                      }`}
-                    >
-                      <div
-                        className={`px-4 py-3 rounded-2xl backdrop-blur-sm border transition-colors duration-300 ${
-                          message.sender === 'user'
-                            ? `${themeClasses.userMessage} rounded-br-sm`
-                            : `${themeClasses.botMessage} rounded-bl-sm`
-                        }`}
-                      >
-                        {message.sender === 'bot' ? (
-                          <div className="prose prose-sm max-w-none">
-                            <ReactMarkdown
-                              remarkPlugins={[remarkGfm]}
-                              components={{
-                                p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-                                ul: ({ children }) => <ul className="list-disc list-inside mb-2">{children}</ul>,
-                                ol: ({ children }) => <ol className="list-decimal list-inside mb-2">{children}</ol>,
-                                li: ({ children }) => <li className="mb-1">{children}</li>,
-                                code: ({ children }) => (
-                                  <code className={`${themeClasses.markdown.code} px-1 py-0.5 rounded text-sm`}>{children}</code>
-                                ),
-                                pre: ({ children }) => (
-                                  <pre className={`${themeClasses.markdown.pre} p-3 rounded-lg overflow-x-auto text-sm my-2`}>{children}</pre>
-                                ),
-                                strong: ({ children }) => <strong className={`font-semibold ${themeClasses.markdown.strong}`}>{children}</strong>,
-                                em: ({ children }) => <em className={`italic ${themeClasses.markdown.em}`}>{children}</em>,
-                                h1: ({ children }) => <h1 className={`text-lg font-bold mb-2 ${themeClasses.markdown.heading}`}>{children}</h1>,
-                                h2: ({ children }) => <h2 className={`text-base font-bold mb-2 ${themeClasses.markdown.heading}`}>{children}</h2>,
-                                h3: ({ children }) => <h3 className={`text-sm font-bold mb-1 ${themeClasses.markdown.heading}`}>{children}</h3>,
-                                blockquote: ({ children }) => (
-                                  <blockquote className={`border-l-4 ${themeClasses.markdown.blockquote} pl-3 italic my-2`}>{children}</blockquote>
-                                ),
-                                a: ({ children, href }) => (
-                                  <a href={href} className={`${themeClasses.markdown.link} underline`} target="_blank" rel="noopener noreferrer">{children}</a>
-                                ),
-                              }}
-                            >
-                              {message.text}
-                            </ReactMarkdown>
-                          </div>
-                        ) : (
-                          <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                            {message.text}
-                          </p>
-                        )}
-                      </div>
-                      {isClient && (
-                        <p className={`text-xs ${themeClasses.timestamp} mt-1 px-2`}>
-                          {message.timestamp.toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))
-              )}
-              <div ref={messagesEndRef}></div>
-            </div>
-
-            {/* Input Area */}
-            <div className={`p-4 ${themeClasses.inputArea} backdrop-blur-sm border-t flex-shrink-0 transition-colors duration-300`}>
-              <div className="flex items-end space-x-3">
-                <div className="flex-1">
-                  <textarea
-                    ref={textareaRef}
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyDown={handleKeyPress}
-                    placeholder="Escribe tu mensaje aquí..."
-                    className={`w-full p-3 border rounded-xl resize-none focus:outline-none focus:ring-2 transition-all duration-200 max-h-32 backdrop-blur-sm overflow-y-auto ${themeClasses.textarea}`}
-                    rows={1}
-                    disabled={isLoading}
-                  />
-                </div>
-                <button
-                  onClick={sendMessage}
-                  disabled={isLoading || !inputValue.trim()}
-                  className={`p-3 ${themeClasses.sendButton} text-white rounded-xl disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-red-500/50`}
-                  title="Enviar mensaje"
-                  aria-label="Enviar mensaje"
-                >
-                  <Send className="w-5 h-5" />
-                </button>
-              </div>
-              <p className={`text-xs ${themeClasses.helpText} mt-2 text-center`}>
-                Presiona Enter para enviar, Shift + Enter para nueva línea
+            <div>
+              <h1 className={`text-lg font-semibold ${themeClasses.sidebarText}`}>
+                Asistente IA
+              </h1>
+              <p className={`text-sm ${themeClasses.sidebarSecondary}`}>
+                Luis Gómez
               </p>
             </div>
           </div>
         </div>
+
+        {/* Spacer */}
+        <div className="flex-1"></div>
+
+        {/* Theme Toggle */}
+        <div className="p-4 border-t border-inherit">
+          <button
+            onClick={toggleTheme}
+            className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 ${themeClasses.themeButton}`}
+            title={isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+          >
+            {isDarkMode ? (
+              <Sun className="w-5 h-5" />
+            ) : (
+              <Moon className="w-5 h-5" />
+            )}
+            <span className="text-sm font-medium">
+              {isDarkMode ? 'Modo claro' : 'Modo oscuro'}
+            </span>
+          </button>
+        </div>
       </div>
 
-      <style jsx>{`
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        .animate-fade-in {
-          animation: fade-in 0.3s ease-out;
-        }
-      `}</style>
+      {/* Main Chat Area */}
+      <div className={`flex-1 flex flex-col ${themeClasses.mainArea} transition-colors duration-300`}>
+        {/* Messages Area */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-3xl mx-auto">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`group px-4 py-6 ${message.sender === 'user' ? '' : themeClasses.messageContainer} transition-colors duration-200`}
+              >
+                <div className={`flex items-start space-x-4 max-w-full ${message.sender === 'user' ? 'justify-end' : ''}`}>
+                  {/* Message Content */}
+                  <div className={`${message.sender === 'user' ? 'max-w-xs sm:max-w-md' : 'flex-1 min-w-0'}`}>
+                    {/* Message Text */}
+                    <div className={`${message.sender === 'bot' ? themeClasses.botMessage : ''}`}>
+                      {message.sender === 'bot' ? (
+                        <div className="prose prose-sm max-w-none">
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                              p: ({ children }) => <p className="mb-3 last:mb-0 leading-relaxed">{children}</p>,
+                              ul: ({ children }) => <ul className="list-disc list-inside mb-3 space-y-1">{children}</ul>,
+                              ol: ({ children }) => <ol className="list-decimal list-inside mb-3 space-y-1">{children}</ol>,
+                              li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+                              code: ({ children }) => (
+                                <code className={`${themeClasses.markdown.code} px-2 py-1 rounded text-sm`}>{children}</code>
+                              ),
+                              pre: ({ children }) => (
+                                <pre className={`${themeClasses.markdown.pre} p-4 rounded-lg overflow-x-auto text-sm my-3`}>{children}</pre>
+                              ),
+                              strong: ({ children }) => <strong className={`font-semibold ${themeClasses.markdown.strong}`}>{children}</strong>,
+                              em: ({ children }) => <em className={`italic ${themeClasses.markdown.em}`}>{children}</em>,
+                              h1: ({ children }) => <h1 className={`text-xl font-bold mb-3 ${themeClasses.markdown.heading}`}>{children}</h1>,
+                              h2: ({ children }) => <h2 className={`text-lg font-bold mb-2 ${themeClasses.markdown.heading}`}>{children}</h2>,
+                              h3: ({ children }) => <h3 className={`text-base font-bold mb-2 ${themeClasses.markdown.heading}`}>{children}</h3>,
+                              blockquote: ({ children }) => (
+                                <blockquote className={`border-l-4 ${themeClasses.markdown.blockquote} pl-4 italic my-3`}>{children}</blockquote>
+                              ),
+                              a: ({ children, href }) => (
+                                <a href={href} className={`${themeClasses.markdown.link} underline`} target="_blank" rel="noopener noreferrer">{children}</a>
+                              ),
+                            }}
+                          >
+                            {message.text}
+                          </ReactMarkdown>
+                        </div>
+                      ) : (
+                        <div className={`${themeClasses.userMessage} px-4 py-3 rounded-2xl inline-block`}>
+                          <div className="whitespace-pre-wrap leading-relaxed text-sm">
+                            {message.text}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            {/* Loading indicator */}
+            {isLoading && (
+              <div className={`group px-4 py-6 ${themeClasses.messageContainer}`}>
+                <div className="flex items-start space-x-4">
+                  <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center">
+                    <Bot className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <div className={`text-sm font-semibold mb-1 ${themeClasses.sidebarText}`}>
+                      Asistente IA
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                        <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                        <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <div ref={messagesEndRef}></div>
+          </div>
+        </div>
+
+        {/* Input Area */}
+        <div className="p-4">
+          <div className="max-w-3xl mx-auto">
+            <div className="relative flex items-end space-x-3">
+              <div className="flex-1 relative">
+                <textarea
+                  ref={textareaRef}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  placeholder="Escribe tu mensaje aquí..."
+                  className={`w-full p-4 pr-12 border rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-red-500 transition-all duration-200 ${themeClasses.inputArea}`}
+                  rows={1}
+                  disabled={isLoading}
+                  style={{ minHeight: '56px', maxHeight: '120px' }}
+                />
+                
+                {/* <button
+                  onClick={sendMessage}
+                  disabled={isLoading || !inputValue.trim()}
+                  className={`absolute right-2 bottom-2 p-2 ${themeClasses.sendButton} rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 disabled:hover:scale-100`}
+                  title="Enviar mensaje"
+                >
+                  <Send className="w-5 h-5" />
+                </button> */}
+              </div>
+            </div>
+            <div className={`text-xs ${themeClasses.sidebarSecondary} mt-2 text-center`}>
+              Presiona Enter para enviar, Shift + Enter para nueva línea
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
