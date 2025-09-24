@@ -94,10 +94,10 @@ export default function Home() {
     setIsLoading(true);
 
     try {
-      // Use environment variable for API URL
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ube-assistant-production.up.railway.app';
+      console.log('Enviando mensaje a API proxy...');
       
-      const response = await fetch(`${apiUrl}/ventas/chat?user_id=luis`, {
+      // Use local API route instead of direct call to Railway
+      const response = await fetch(`/api/chat?user_id=luis`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -106,13 +106,22 @@ export default function Home() {
         body: JSON.stringify({ query: currentInput })
       });
 
+      console.log('Response status:', response.status);
+
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`HTTP Error ${response.status}:`, errorText);
-        throw new Error(`Error HTTP: ${response.status} - ${errorText}`);
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch {
+          errorData = { error: await response.text() };
+        }
+        console.error(`HTTP Error ${response.status}:`, errorData);
+        throw new Error(errorData.error || `Error HTTP: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log('Response data:', data);
+      
       const botTimestamp = new Date();
 
       const botMessage: Message = {
