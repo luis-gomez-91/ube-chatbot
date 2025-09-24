@@ -42,14 +42,12 @@ export default function Home() {
       setIsDarkMode(prefersDark);
     }
 
-    setMessages([
-      // {
-      //   id: 'welcome',
-      //   text: '¡Hola! Soy tu asistente de IA. ¿En qué puedo ayudarte hoy?',
-      //   sender: 'bot',
-      //   timestamp: new Date()
-      // }
-    ]);
+    setMessages([{
+      id: 'welcome',
+      text: '¡Hola! Soy tu asistente de IA. ¿En qué puedo ayudarte hoy?',
+      sender: 'bot',
+      timestamp: new Date()
+    }]);
   }, []);
 
   // Save theme preference
@@ -96,14 +94,22 @@ export default function Home() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`https://ube-assistant-production.up.railway.app/ventas/chat?user_id=luis`, {
+      // Use environment variable for API URL
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ube-assistant-production.up.railway.app';
+      
+      const response = await fetch(`${apiUrl}/ventas/chat?user_id=luis`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
         body: JSON.stringify({ query: currentInput })
       });
 
       if (!response.ok) {
-        throw new Error(`Error HTTP: ${response.status}`);
+        const errorText = await response.text();
+        console.error(`HTTP Error ${response.status}:`, errorText);
+        throw new Error(`Error HTTP: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
@@ -119,11 +125,27 @@ export default function Home() {
       setMessages(prev => [...prev, botMessage]);
 
     } catch (error) {
-      console.error('Error al llamar a FastAPI:', error);
+      console.error('Error completo:', error);
+      
+      let errorText = 'Error al comunicarse con el servidor. Por favor, intenta nuevamente.';
+      
+      // More specific error messages
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        errorText = 'Error de conexión. Verifica tu conexión a internet.';
+      } else if (error instanceof Error) {
+        if (error.message.includes('CORS')) {
+          errorText = 'Error de CORS. El servidor necesita configuración adicional.';
+        } else if (error.message.includes('404')) {
+          errorText = 'Endpoint no encontrado. Verifica la URL de la API.';
+        } else if (error.message.includes('500')) {
+          errorText = 'Error interno del servidor. Intenta más tarde.';
+        }
+      }
+
       const errorTimestamp = new Date();
       const errorMessage: Message = {
         id: `error-${errorTimestamp.getTime()}`,
-        text: 'Error al comunicarse con el servidor. Por favor, intenta nuevamente.',
+        text: errorText,
         sender: 'bot',
         timestamp: errorTimestamp,
       };
