@@ -15,6 +15,8 @@ export interface ThemeClasses {
   sidebar: string;
   mainArea: string;
   sidebarText: string;
+  textPrimary: string;
+  textSecondary: string;
   sidebarSecondary: string;
   themeButton: string;
   messageContainer: string;

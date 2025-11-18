@@ -12,9 +12,15 @@ const getThemeClasses = (isDarkMode: boolean): ThemeClasses => ({
     sidebarText: isDarkMode
       ? 'text-slate-100'
       : 'text-slate-900',
+    textPrimary: isDarkMode
+      ? 'text-white'
+      : 'text-slate-900',
+    textSecondary: isDarkMode
+      ? 'text-slate-300'
+      : 'text-slate-700',
     sidebarSecondary: isDarkMode
       ? 'text-slate-400'
-      : 'text-slate-600',
+      : 'text-slate-400',
     themeButton: isDarkMode
       ? 'hover:bg-slate-800 text-slate-300 hover:text-slate-100'
       : 'hover:bg-slate-200 text-slate-600 hover:text-slate-900',

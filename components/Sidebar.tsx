@@ -6,7 +6,7 @@ import { Moon, Sun, MessageSquarePlus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { SidebarProps } from '../types/chat';
 import Image from 'next/image';
-import { quickActions } from '../public/constants/quickActions';
+import { getQuickActions } from '../public/constants/quickActions'; // ✅ Nueva importación
 
 interface HistoryItem {
   id: number;
@@ -23,21 +23,27 @@ const Sidebar: React.FC<SidebarProps & { onQuickAction?: (text: string) => void;
   const [currentUsername, setCurrentUsername] = useState<string | null>(null);
   const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
+  const [authProvider, setAuthProvider] = useState<string>('drf'); // ✅ Nuevo estado
+  const [quickActions, setQuickActions] = useState<any[]>([]); // ✅ Nuevo estado
   const router = useRouter();
 
   useEffect(() => {
     const loadUsername = () => {
-      const userDataString = localStorage.getItem('userData'); 
+      const userDataString = localStorage.getItem('userData');
+      const provider = localStorage.getItem('authProvider') || 'drf'; // ✅ Obtener proveedor
+      
       if (userDataString) {
         try {
           const userData = JSON.parse(userDataString);
           setCurrentUsername(userData.username || userData.nombre || 'Usuario Autenticado');
+          setAuthProvider(provider); // ✅ Guardar proveedor
+          setQuickActions(getQuickActions(provider)); // ✅ Obtener quickActions dinámicos
         } catch (e) {
           console.error('Error al parsear los datos de usuario de localStorage', e);
           setCurrentUsername('Error al cargar');
         }
       } else {
-        setCurrentUsername(null); 
+        setCurrentUsername(null);
       }
     };
 
@@ -137,10 +143,10 @@ const Sidebar: React.FC<SidebarProps & { onQuickAction?: (text: string) => void;
         </button>
       </div>
 
-      {/* Accesos Rápidos */}
+      {/* Accesos Rápidos - ✅ USANDO QUICKACTIONS DINÁMICOS */}
       <div className="px-4 flex-shrink-0">
         <h3 className="text-xs font-semibold uppercase tracking-wider opacity-60 mb-2 px-1">
-          Accesos Rápidos
+          {authProvider === 'ube' ? 'Mis Accesos' : 'Accesos Rápidos'}
         </h3>
         <div className="flex flex-col gap-1">
           {quickActions.map((action) => {
@@ -160,8 +166,9 @@ const Sidebar: React.FC<SidebarProps & { onQuickAction?: (text: string) => void;
                     : 'hover:bg-gray-100 active:bg-gray-200 text-gray-600'
                   }
                 `}
+                title={action.description}
               >
-                <Icon className="w-4 h-4 opacity-70" />
+                <Icon className="w-4 h-4 opacity-70 flex-shrink-0" />
                 <span className="truncate">{action.label}</span>
               </button>
             );

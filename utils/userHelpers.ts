@@ -28,7 +28,7 @@ export const getFullName = (userData: UserData | null, authProvider: string = 'd
   }
 
   // DRF
-  if (authProvider === 'drf') {
+  if (authProvider === 'ube') {
     const firstName = userData.first_name || '';
     const lastName = userData.last_name || '';
     if (firstName || lastName) {

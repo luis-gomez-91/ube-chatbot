@@ -1,23 +1,29 @@
 // hooks/useSessionExpiration.ts
 'use client';
 
-import { useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 export default function useSessionExpiration() {
   const router = useRouter();
 
   const handleSessionExpired = useCallback(() => {
-    // Muestra alerta
-    alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+    // Toast elegante con sonner
+    toast.error('Sesión expirada', {
+      description: 'Tu sesión ha expirado. Serás redirigido al inicio de sesión.',
+      duration: 4000,
+    });
     
     // Limpia el token
     if (typeof window !== 'undefined') {
       localStorage.removeItem('accessToken');
     }
     
-    // Redirige al login
-    router.push('/auth');
+    // Redirige después de 1 segundo para que vea el toast
+    setTimeout(() => {
+      router.push('/auth');
+    }, 1000);
   }, [router]);
 
   return { handleSessionExpired };

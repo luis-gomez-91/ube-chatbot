@@ -30,7 +30,7 @@ export default function ChatPage() {
   const [isClient, setIsClient] = useState(false);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [authProvider, setAuthProvider] = useState<string>('');
-  const [chatId, setChatId] = useState<string | null>(null);  // ✅ Estado para guardar chat_id
+  const [chatId, setChatId] = useState<string | null>(null);
   
   const router = useRouter();
   const { isDarkMode, toggleTheme, themeClasses } = useChatTheme(isClient); 
