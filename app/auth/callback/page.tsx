@@ -5,10 +5,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-);
+export const dynamic = 'force-dynamic';
 
 export default function AuthCallbackPage() {
   const router = useRouter();
@@ -17,6 +14,16 @@ export default function AuthCallbackPage() {
 
   useEffect(() => {
     const handleCallback = async () => {
+      const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      if (!url || !key || (!url.startsWith('http://') && !url.startsWith('https://'))) {
+        setError('Configuración de autenticación no disponible');
+        setLoading(false);
+        return;
+      }
+
+      const supabase = createClient(url, key);
+
       try {
         // Obtiene la sesión actual después del redirect de OAuth
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
