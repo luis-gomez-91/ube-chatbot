@@ -46,7 +46,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, themeClasses }) => {
                     ul: ({ children }) => <ul className="list-disc list-inside mb-3 space-y-1">{children}</ul>,
                     ol: ({ children }) => <ol className="list-decimal list-inside mb-3 space-y-1">{children}</ol>,
                     li: ({ children }) => <li className="leading-relaxed">{children}</li>,
-                    code: ({ node, children, ...props }) => (
+                    code: ({ children, ...props }) => (
                       <code className={`${themeClasses.markdown.code} px-2 py-1 rounded text-sm`} {...props}>{children}</code>
                     ),
                     pre: ({ children, ...props }) => (

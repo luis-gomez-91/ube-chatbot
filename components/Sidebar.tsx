@@ -3,10 +3,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { MessageSquarePlus } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { SidebarProps } from '../types/chat';
 import Image from 'next/image';
-import { getQuickActions } from '../public/constants/quickActions'; // ✅ Nueva importación
+import { getQuickActions, type QuickAction } from '../public/constants/quickActions';
 
 interface HistoryItem {
   id: number;
@@ -19,12 +18,10 @@ const Sidebar: React.FC<SidebarProps & { onQuickAction?: (text: string) => void;
   onNewChat
 }) => {
   const isDarkMode = themeClasses.sidebar.includes('bg-slate-900');
-  const [currentUsername, setCurrentUsername] = useState<string | null>(null);
   const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
-  const [authProvider, setAuthProvider] = useState<string>('drf'); // ✅ Nuevo estado
-  const [quickActions, setQuickActions] = useState<any[]>([]); // ✅ Nuevo estado
-  const router = useRouter();
+  const [authProvider, setAuthProvider] = useState<string>('drf');
+  const [quickActions, setQuickActions] = useState<QuickAction[]>([]);
 
   useEffect(() => {
     const loadUsername = () => {
@@ -33,16 +30,12 @@ const Sidebar: React.FC<SidebarProps & { onQuickAction?: (text: string) => void;
       
       if (userDataString) {
         try {
-          const userData = JSON.parse(userDataString);
-          setCurrentUsername(userData.username || userData.nombre || 'Usuario Autenticado');
-          setAuthProvider(provider); // ✅ Guardar proveedor
-          setQuickActions(getQuickActions(provider)); // ✅ Obtener quickActions dinámicos
+          JSON.parse(userDataString);
+          setAuthProvider(provider);
+          setQuickActions(getQuickActions(provider));
         } catch (e) {
           console.error('Error al parsear los datos de usuario de localStorage', e);
-          setCurrentUsername('Error al cargar');
         }
-      } else {
-        setCurrentUsername(null);
       }
     };
 

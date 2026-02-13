@@ -27,7 +27,7 @@ export default function AuthPage() {
     setError('');
 
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
@@ -39,18 +39,18 @@ export default function AuthPage() {
       }
 
       // La redirección se maneja automáticamente por Supabase
-    } catch (err: any) {
-      setError(err.message || 'Error al iniciar sesión con Google');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error al iniciar sesión con Google');
       setLoadingGoogle(false);
     }
   };
 
-  const handleFacebookLogin = async () => {
+  const _handleFacebookLogin = async () => {
     setLoadingGoogle(true);
     setError('');
 
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'facebook',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
@@ -60,8 +60,8 @@ export default function AuthPage() {
       if (error) {
         throw error;
       }
-    } catch (err: any) {
-      setError(err.message || 'Error al iniciar sesión con Facebook');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error al iniciar sesión con Facebook');
       setLoadingGoogle(false);
     }
   };
@@ -99,7 +99,7 @@ export default function AuthPage() {
           <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <div className="mb-5 text-center">
               <h2 className="text-lg font-semibold text-gray-900">Elige cómo iniciar sesión</h2>
-              <p className="text-xs text-gray-500 mt-1">UBE, Google o Facebook</p>
+              <p className="text-xs text-gray-500 mt-1">UBE o Google</p>
             </div>
             <div className="space-y-3">
               <button
@@ -133,12 +133,12 @@ export default function AuthPage() {
 
               <button
                 type="button"
-                onClick={handleFacebookLogin}
-                disabled={loadingGoogle}
-                className="w-full flex items-center justify-center gap-3 rounded-xl border border-gray-300 bg-gray-50/50 px-4 py-3.5 text-sm font-medium text-gray-700 transition-colors hover:border-red-500/50 hover:bg-red-50/50 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:ring-offset-0 disabled:pointer-events-none disabled:opacity-60"
+                disabled
+                onClick={_handleFacebookLogin}
+                className="w-full flex items-center justify-center gap-3 rounded-xl border border-gray-200 bg-gray-100 px-4 py-3.5 text-sm font-medium text-gray-400 cursor-not-allowed"
               >
                 <FacebookIcon className="w-5 h-5 shrink-0" />
-                <span>{loadingGoogle ? 'Conectando...' : 'Iniciar sesión con Facebook'}</span>
+                <span>Iniciar sesión con Facebook</span>
               </button>
             </div>
           </div>

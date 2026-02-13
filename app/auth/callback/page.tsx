@@ -45,9 +45,9 @@ export default function AuthCallbackPage() {
         
         // Redirige al chat
         router.push('/chat');
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Error en callback:', err);
-        setError(err.message || 'Error al procesar la autenticación');
+        setError(err instanceof Error ? err.message : 'Error al procesar la autenticación');
         setLoading(false);
         
         // Redirige al login después de 3 segundos

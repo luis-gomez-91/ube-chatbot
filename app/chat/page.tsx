@@ -105,17 +105,6 @@ export default function ChatPage() {
     return userData.name || userData.email || 'Usuario';
   };
 
-  const getUserEmail = (): string => {
-    return userData?.email || 'Sin email';
-  };
-
-  const getUserAvatar = (): string | null => {
-    if (authProvider === 'google' || authProvider === 'facebook') {
-      return userData?.user_metadata?.avatar_url || null;
-    }
-    return null;
-  };
-
   const sendMessage = async () => {
     const accessToken = getAccessToken();
     
@@ -305,10 +294,6 @@ export default function ChatPage() {
           themeClasses={themeClasses}
           onQuickAction={handleQuickAction}
           onNewChat={handleNewChat}
-          userName={getUserName()}
-          userEmail={getUserEmail()}
-          userAvatar={getUserAvatar()}
-          authProvider={authProvider}
         />
       </div>
 

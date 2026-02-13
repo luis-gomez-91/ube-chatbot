@@ -7,11 +7,10 @@ import MessageItem from './MessageItem';
 import { Bot, Sparkles, LogOut, FileText, Shield, Moon, Sun } from 'lucide-react';
 import { ChatAreaProps } from '../types/chat';
 import Image from 'next/image';
-import { getQuickActions } from '../public/constants/quickActions';
+import { getQuickActions, type QuickAction } from '../public/constants/quickActions';
 import { 
   getFullName, 
   getFirstName, 
-  getUserEmail, 
   getUserAvatar, 
   UserData 
 } from '../utils/userHelpers';
@@ -31,7 +30,7 @@ const ChatArea: React.FC<ChatAreaProps & { onQuickAction?: (text: string) => voi
   const [authProvider, setAuthProvider] = useState<string>('drf');
   const [imageError, setImageError] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [quickActions, setQuickActions] = useState<any[]>([]);
+  const [quickActions, setQuickActions] = useState<QuickAction[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Cerrar dropdown al hacer clic fuera

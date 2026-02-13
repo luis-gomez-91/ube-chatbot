@@ -3,10 +3,35 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Send, Mic, MicOff, AlertCircle } from 'lucide-react';
 import { ChatInputProps } from '../types/chat';
 
+interface SpeechRecognitionResultEvent {
+  resultIndex: number;
+  results: {
+    length: number;
+    [i: number]: { isFinal: boolean; 0: { transcript: string }; length: number };
+  };
+}
+
+interface SpeechRecognitionErrorEvent {
+  error: string;
+}
+
+interface SpeechRecognitionInstance {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  maxAlternatives: number;
+  start(): void;
+  stop(): void;
+  onstart: () => void;
+  onresult: (event: SpeechRecognitionResultEvent) => void;
+  onerror: (event: SpeechRecognitionErrorEvent) => void;
+  onend: () => void;
+}
+
 declare global {
   interface Window {
-    SpeechRecognition: any;
-    webkitSpeechRecognition: any;
+    SpeechRecognition?: new () => SpeechRecognitionInstance;
+    webkitSpeechRecognition?: new () => SpeechRecognitionInstance;
   }
 }
 
@@ -18,7 +43,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   themeClasses 
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [voiceSupported, setVoiceSupported] = useState(false);
   const [error, setError] = useState<string>('');
@@ -53,7 +78,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
         interimTranscriptRef.current = '';
       };
 
-      recognition.onresult = (event: any) => {
+      recognition.onresult = (event: SpeechRecognitionResultEvent) => {
         let newInterimTranscript = '';
         
         for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -91,7 +116,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
         }
       };
 
-      recognition.onerror = (event: any) => {
+      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
         console.error('❌ Error de reconocimiento:', event.error);
         
         if (event.error === 'no-speech') {
@@ -129,7 +154,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
       if (recognitionRef.current) {
         try {
           recognitionRef.current.stop();
-        } catch (e) {
+        } catch {
           console.log('Cleanup - no se pudo detener');
         }
       }

@@ -78,14 +78,14 @@ export default function AuthForm() {
       console.log('Datos del usuario guardados:', userData);
       router.push('/chat');
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Limpiar tokens si hubo un error
       if (typeof window !== 'undefined') {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('userData');
       }
-      setError(err.message || 'Ocurrió un error inesperado durante la autenticación.');
+      setError(err instanceof Error ? err.message : 'Ocurrió un error inesperado durante la autenticación.');
     } finally {
       setLoading(false);
     }

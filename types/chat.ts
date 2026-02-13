@@ -52,7 +52,7 @@ export interface SidebarProps {
 export interface ChatAreaProps {
   messages: Message[];
   isLoading: boolean;
-  messagesEndRef: RefObject<HTMLDivElement>;
+  messagesEndRef: RefObject<HTMLDivElement | null>;
   themeClasses: ThemeClasses;
   isDarkMode?: boolean;
   toggleTheme?: () => void;
