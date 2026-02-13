@@ -1,36 +1,130 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# UBE Chatbot
 
-## Getting Started
+Chatbot web para la **Universidad de Educación (UBE)**. Permite a estudiantes y usuarios consultar información académica y administrativa mediante conversación con un asistente basado en IA.
 
-First, run the development server:
+---
+
+## ¿Qué hace la aplicación?
+
+- **Inicio de sesión**
+  - **Credenciales UBE:** usuario y contraseña del SGA (Sistema de Gestión Académica).
+  - **Google:** inicio de sesión con cuenta de Google (OAuth vía Supabase).
+
+- **Chat con IA**
+  - Envío de mensajes de texto al asistente.
+  - Respuestas en tiempo real desde un backend de chat (configurable por URL).
+  - Historial de conversaciones por usuario.
+
+- **Accesos rápidos**
+  - Para usuarios UBE: temas como pagos, horarios, plataforma virtual, certificados, vida universitaria, graduación.
+  - Para otros usuarios: información general y preguntas frecuentes.
+
+- **Entrada por voz**
+  - Reconocimiento de voz en español para escribir mensajes con el micrófono (navegadores compatibles).
+
+- **Interfaz**
+  - Modo claro / oscuro (selector en el menú del avatar).
+  - Barra lateral con nuevo chat, accesos rápidos e historial.
+  - Páginas de Términos y condiciones y Política de privacidad.
+
+- **Seguridad**
+  - Sesión con token (localStorage). Redirección a login si no hay sesión.
+  - El frontend actúa como proxy hacia el backend de chat (envío de mensajes y historial).
+
+---
+
+## Tecnologías
+
+- **Next.js 15** (App Router, Turbopack)
+- **React 19**
+- **TypeScript**
+- **Tailwind CSS 4**
+- **Supabase** (auth con Google)
+- **React Markdown** (respuestas del bot)
+- **Lucide React** (iconos)
+
+El backend del chat es externo: la app solo consume su API (ver variables de entorno).
+
+---
+
+## Requisitos
+
+- **Node.js** 18+
+- **npm** (o yarn / pnpm)
+
+---
+
+## Cómo levantar el proyecto en local
+
+### 1. Clonar e instalar
+
+```bash
+git clone <url-del-repositorio>
+cd ube-chatbot
+npm install
+```
+
+### 2. Variables de entorno
+
+Crea un archivo `.env.local` en la raíz con:
+
+| Variable | Descripción |
+|----------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | URL del proyecto en Supabase (Dashboard → Settings → API). |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clave anónima (anon key) de Supabase. |
+| `NEXT_PUBLIC_API_URL` | URL base del backend del chat (ej. `https://tu-backend.up.railway.app`). Sin barra final. |
+
+Ejemplo:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+NEXT_PUBLIC_API_URL=https://ube-assistant-backend-production.up.railway.app
+```
+
+### 3. Ejecutar
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre [http://localhost:3000](http://localhost:3000). La raíz redirige a `/auth` si no hay sesión o a `/chat` si ya estás autenticado.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 4. Build para producción
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Estructura principal
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+app/
+  page.tsx          # Redirección / → /auth o /chat
+  auth/             # Login (UBE, Google) y callback OAuth
+  chat/             # Página del chat
+  privacy/          # Política de privacidad
+  terms/            # Términos y condiciones
+  api/chat/         # Proxy al backend de chat e historial
+components/         # ChatArea, ChatInput, Sidebar, AuthForm, etc.
+hooks/              # useChatTheme, useSessionExpiration
+public/constants/   # Accesos rápidos (UBE y general)
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Despliegue (Vercel u otro)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Configura las mismas variables de entorno en el panel del proveedor.
+- En **Supabase → Authentication → URL Configuration**, añade en **Redirect URLs** la URL de tu app, por ejemplo:  
+  `https://tu-dominio.vercel.app/auth/callback`.
+- El backend del chat debe aceptar peticiones desde el origen de tu frontend (CORS si aplica).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Licencia
+
+Uso en el marco del proyecto UBE. Consulta con la institución para términos concretos.
