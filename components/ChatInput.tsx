@@ -1,6 +1,6 @@
 // components/ChatInput.tsx
 import React, { useRef, useEffect, useState } from 'react';
-import { Send, Mic, MicOff } from 'lucide-react';
+import { Send, Mic, MicOff, AlertCircle } from 'lucide-react';
 import { ChatInputProps } from '../types/chat';
 
 declare global {
@@ -154,6 +154,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   };
 
   const toggleVoiceInput = () => {
+    setError(''); // Limpiar error al intentar de nuevo
     if (!recognitionRef.current) {
       setError('Micrófono no disponible');
       return;
@@ -179,6 +180,12 @@ const ChatInput: React.FC<ChatInputProps> = ({
     }
   };
 
+  // Limpiar error de voz cuando el usuario escribe
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInputValue(e.target.value);
+    if (error) setError('');
+  };
+
   return (
     <div className="p-4">
       <div className="max-w-3xl mx-auto">
@@ -187,17 +194,17 @@ const ChatInput: React.FC<ChatInputProps> = ({
             <textarea
               ref={textareaRef}
               value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
+              onChange={handleInputChange}
               onKeyDown={handleKeyPress}
-              placeholder={isListening ? "🎤 Escuchando en tiempo real..." : "Escribe tu mensaje aquí..."}
-              className={`w-full p-4 pr-24 border rounded-2xl resize-none focus:outline-none focus:ring-2 transition-all duration-200 ${
+              placeholder={isListening ? "El texto aparecerá aquí mientras hablas..." : "Escribe tu mensaje aquí..."}
+              className={`w-full p-4 pr-24 border rounded-2xl resize-none focus:outline-none focus:ring-2 transition-all duration-200 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden ${
                 isListening 
                   ? 'focus:ring-red-500 border-red-500 bg-red-50 dark:bg-red-900/10' 
                   : 'focus:ring-red-500'
               } ${themeClasses.inputArea}`}
               rows={1}
               disabled={isLoading}
-              style={{ minHeight: '56px', maxHeight: '120px' }}
+              style={{ minHeight: '56px', maxHeight: '120px', overflow: 'auto' }}
             />
             
             {/* Botón de Micrófono */}
@@ -206,12 +213,13 @@ const ChatInput: React.FC<ChatInputProps> = ({
                 onClick={toggleVoiceInput}
                 disabled={isLoading}
                 type="button"
-                className={`absolute right-14 bottom-4 p-2 rounded-xl transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed ${
+                aria-label={isListening ? 'Detener reconocimiento de voz' : 'Hablar con el micrófono'}
+                className={`absolute right-14 bottom-4 p-2.5 rounded-xl transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-1 ${
                   isListening 
-                    ? 'bg-red-500 text-white scale-110 shadow-lg animate-pulse' 
+                    ? 'bg-red-500 text-white scale-110 shadow-lg ring-2 ring-red-400/50' 
                     : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-red-500 hover:text-white'
                 }`}
-                title={isListening ? "Detener escucha" : "Activar micrófono"}
+                title={isListening ? "Detener (o espera un momento de silencio)" : "Toca para hablar"}
               >
                 {isListening ? (
                   <MicOff className="w-5 h-5" />
@@ -234,19 +242,26 @@ const ChatInput: React.FC<ChatInputProps> = ({
           </div>
         </div>
 
+        {/* Errores de voz */}
+        {error && (
+          <div className="mt-2 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 px-3 py-2 text-sm text-red-700 dark:text-red-300">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            <span className="flex-1">{error}</span>
+          </div>
+        )}
+
         {/* Indicaciones */}
         <div className={`text-xs ${themeClasses.sidebarSecondary} mt-2 text-center`}>
-          {error && <div className="text-red-500 mb-1">{error}</div>}
           {isListening ? (
-            <span className="flex items-center justify-center gap-2">
-              <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-              <span>Escuchando... (se detiene automáticamente)</span>
+            <span className="flex items-center justify-center gap-2 flex-wrap">
+              <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" aria-hidden />
+              <span>Habla ahora. Se detiene solo tras un momento de silencio, o toca el micrófono para terminar.</span>
             </span>
           ) : (
-            <>
-              Presiona Enter para enviar • 
-              {voiceSupported && ' • 🎤 para hablar'}
-            </>
+            <span>
+              Enter para enviar
+              {voiceSupported && ' · Toca el micrófono para hablar'}
+            </span>
           )}
         </div>
       </div>

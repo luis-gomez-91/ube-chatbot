@@ -44,8 +44,6 @@ export interface UseChatThemeResult {
 
 // Tipificación de Props para Sidebar
 export interface SidebarProps {
-  isDarkMode: boolean;
-  toggleTheme: () => void;
   themeClasses: ThemeClasses;
   onQuickAction?: (text: string) => void;
 }
@@ -56,6 +54,8 @@ export interface ChatAreaProps {
   isLoading: boolean;
   messagesEndRef: RefObject<HTMLDivElement>;
   themeClasses: ThemeClasses;
+  isDarkMode?: boolean;
+  toggleTheme?: () => void;
 }
 
 // Tipificación de Props para ChatInput

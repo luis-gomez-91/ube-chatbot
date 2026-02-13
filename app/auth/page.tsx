@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import AuthForm from '../../components/AuthForm';
 import { GoogleIcon, FacebookIcon } from '../../components/Icons';
 import Link from 'next/link';
+import { ArrowLeft, AlertCircle, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { createClient } from '@supabase/supabase-js';
 
@@ -87,61 +88,99 @@ export default function AuthPage() {
           />
         </div>
 
-        <div className="flex flex-col items-center space-y-4 mt-5">
-          <h1 className="text-3xl font-semibold text-center">Inicia sesión</h1>
-        </div>
-
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-            {error}
+          <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <AlertCircle className="h-5 w-5 shrink-0 mt-0.5 text-red-500" />
+            <p className="flex-1">{error}</p>
           </div>
         )}
 
         {!showUbeForm ? (
-          <div className="space-y-4">
-            <button
-              onClick={handleUbeLogin}
-              className="w-full px-4 py-3 border border-gray-300 rounded-full flex items-center justify-center space-x-2 text-sm font-medium hover:bg-gray-50 transition-colors"
-            >
-              <Image 
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+            <div className="mb-5 text-center">
+              <h2 className="text-lg font-semibold text-gray-900">Elige cómo iniciar sesión</h2>
+              <p className="text-xs text-gray-500 mt-1">UBE, Google o Facebook</p>
+            </div>
+            <div className="space-y-3">
+              <button
+                type="button"
+                onClick={handleUbeLogin}
+                className="w-full flex items-center justify-center gap-3 rounded-xl border border-gray-300 bg-gray-50/50 px-4 py-3.5 text-sm font-medium text-gray-700 transition-colors hover:border-red-500/50 hover:bg-red-50/50 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:ring-offset-0"
+              >
+                <Image
                   src="https://upload.wikimedia.org/wikipedia/commons/a/ae/Universidad_Bolivariana_del_Ecuador_logo_1.svg"
-                  alt="Logo UBE"
-                  width={20}
-                  height={20}
-                  className="mr-2"
-              />
-              <span>Iniciar sesión con UBE</span>
-            </button>
+                  alt=""
+                  width={22}
+                  height={22}
+                  className="object-contain shrink-0"
+                />
+                <span>Iniciar sesión con UBE</span>
+              </button>
 
-            <button
-              onClick={handleGoogleLogin}
-              disabled={loadingGoogle}
-              className="w-full px-4 py-3 border border-gray-300 rounded-full flex items-center justify-center space-x-2 text-sm font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <GoogleIcon className="w-5 h-5" />
-              <span>{loadingGoogle ? 'Conectando...' : 'Iniciar sesión con Google'}</span>
-            </button>
+              <button
+                type="button"
+                onClick={handleGoogleLogin}
+                disabled={loadingGoogle}
+                className="w-full flex items-center justify-center gap-3 rounded-xl border border-gray-300 bg-gray-50/50 px-4 py-3.5 text-sm font-medium text-gray-700 transition-colors hover:border-red-500/50 hover:bg-red-50/50 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:ring-offset-0 disabled:pointer-events-none disabled:opacity-60"
+              >
+                {loadingGoogle ? (
+                  <Loader2 className="h-5 w-5 shrink-0 animate-spin" />
+                ) : (
+                  <GoogleIcon className="w-5 h-5 shrink-0" />
+                )}
+                <span>{loadingGoogle ? 'Conectando...' : 'Iniciar sesión con Google'}</span>
+              </button>
 
-            <button
-              onClick={handleFacebookLogin}
-              disabled={loadingGoogle}
-              className="w-full px-4 py-3 border border-gray-300 rounded-full flex items-center justify-center space-x-2 text-sm font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <FacebookIcon className="w-5 h-5" />
-              <span>{loadingGoogle ? 'Conectando...' : 'Iniciar sesión con Facebook'}</span>
-            </button>
+              <button
+                type="button"
+                onClick={handleFacebookLogin}
+                disabled={loadingGoogle}
+                className="w-full flex items-center justify-center gap-3 rounded-xl border border-gray-300 bg-gray-50/50 px-4 py-3.5 text-sm font-medium text-gray-700 transition-colors hover:border-red-500/50 hover:bg-red-50/50 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:ring-offset-0 disabled:pointer-events-none disabled:opacity-60"
+              >
+                <FacebookIcon className="w-5 h-5 shrink-0" />
+                <span>{loadingGoogle ? 'Conectando...' : 'Iniciar sesión con Facebook'}</span>
+              </button>
+            </div>
           </div>
         ) : (
-          <AuthForm />
+          <div className="w-full space-y-5">
+            <button
+              type="button"
+              onClick={() => setShowUbeForm(false)}
+              className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-red-600 transition-colors py-1 -ml-1 rounded-md hover:bg-gray-100 px-2"
+              aria-label="Volver a las opciones de inicio de sesión"
+            >
+              <ArrowLeft className="w-4 h-4 shrink-0" />
+              <span>Volver a las opciones de inicio de sesión</span>
+            </button>
+            <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50">
+                  <Image
+                    src="https://upload.wikimedia.org/wikipedia/commons/a/ae/Universidad_Bolivariana_del_Ecuador_logo_1.svg"
+                    alt=""
+                    width={24}
+                    height={24}
+                    className="object-contain"
+                  />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">Credenciales UBE</h2>
+                  <p className="text-xs text-gray-500">Usuario y contraseña del SGA</p>
+                </div>
+              </div>
+              <AuthForm />
+            </div>
+          </div>
         )}
 
         {/* Enlaces de términos y privacidad */}
         <div className="text-center text-xs text-gray-500 flex gap-4 justify-center align-middle">
-            <Link href="/terms" className="text-gray-600 underline hover:text-sky-500">
+            <Link href="/terms" className="text-gray-600 underline hover:text-red-600">
               Términos de uso
             </Link>{' '}
             |
-            <Link href="/privacy" className="text-gray-600 underline hover:text-sky-500">
+            <Link href="/privacy" className="text-gray-600 underline hover:text-red-600">
               Política de privacidad
             </Link>
         </div>

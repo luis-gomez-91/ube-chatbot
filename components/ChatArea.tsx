@@ -2,8 +2,9 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
+import Link from 'next/link';
 import MessageItem from './MessageItem';
-import { Bot, Sparkles, LogOut, FileText, Shield } from 'lucide-react';
+import { Bot, Sparkles, LogOut, FileText, Shield, Moon, Sun } from 'lucide-react';
 import { ChatAreaProps } from '../types/chat';
 import Image from 'next/image';
 import { getQuickActions } from '../public/constants/quickActions';
@@ -20,7 +21,9 @@ const ChatArea: React.FC<ChatAreaProps & { onQuickAction?: (text: string) => voi
   isLoading, 
   messagesEndRef, 
   themeClasses,
-  onQuickAction 
+  onQuickAction,
+  isDarkMode = false,
+  toggleTheme
 }) => {
   
   const isEmpty = messages.length === 0 && !isLoading;
@@ -186,35 +189,60 @@ const ChatArea: React.FC<ChatAreaProps & { onQuickAction?: (text: string) => voi
               )}
 
               <div className="py-2">
-                <a 
-                  href="https://ube.edu.ec/terminos-condiciones"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link 
+                  href="/terms"
                   className={`
                     flex items-center gap-3 px-4 py-3 text-sm
                     transition-colors duration-200
                     ${themeClasses.sidebarText}
-                    hover:bg-slate-800 dark:hover:bg-slate-700
+                    ${isDarkMode ? 'hover:bg-slate-700/80 hover:text-red-400' : 'hover:bg-slate-200 hover:text-red-600'}
                   `}
                 >
                   <FileText className="w-4 h-4 opacity-70" />
                   <span>Términos y Condiciones</span>
-                </a>
+                </Link>
 
-                <a 
-                  href="https://ube.edu.ec/politica-privacidad"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link 
+                  href="/privacy"
                   className={`
                     flex items-center gap-3 px-4 py-3 text-sm
                     transition-colors duration-200
                     ${themeClasses.sidebarText}
-                    hover:bg-slate-800 dark:hover:bg-slate-700
+                    ${isDarkMode ? 'hover:bg-slate-700/80 hover:text-red-400' : 'hover:bg-slate-200 hover:text-red-600'}
                   `}
                 >
                   <Shield className="w-4 h-4 opacity-70" />
                   <span>Política de Privacidad</span>
-                </a>
+                </Link>
+
+                {toggleTheme && (
+                  <button
+                    type="button"
+                    onClick={() => { toggleTheme(); }}
+                    className={`
+                      w-full flex items-center justify-between gap-3 px-4 py-3 text-sm
+                      transition-colors duration-200
+                      ${themeClasses.sidebarText}
+                      ${isDarkMode ? 'hover:bg-slate-700/80 hover:text-red-400' : 'hover:bg-slate-200 hover:text-red-600'}
+                    `}
+                    title={isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+                  >
+                    <span className="flex items-center gap-3">
+                      {isDarkMode ? <Sun className="w-4 h-4 opacity-70" /> : <Moon className="w-4 h-4 opacity-70" />}
+                      <span>{isDarkMode ? 'Modo claro' : 'Modo oscuro'}</span>
+                    </span>
+                    <div className={`
+                      w-9 h-5 rounded-full relative transition-colors duration-200 shrink-0
+                      ${isDarkMode ? 'bg-red-600' : 'bg-gray-300 dark:bg-slate-600'}
+                    `}>
+                      <div className={`
+                        absolute top-0.5 w-4 h-4 rounded-full bg-white
+                        transition-transform duration-200
+                        ${isDarkMode ? 'translate-x-4' : 'translate-x-0.5'}
+                      `} />
+                    </div>
+                  </button>
+                )}
 
                 <div className={`
                   border-t my-2
@@ -230,8 +258,7 @@ const ChatArea: React.FC<ChatAreaProps & { onQuickAction?: (text: string) => voi
                   className={`
                     w-full flex items-center gap-3 px-4 py-3 text-sm
                     transition-colors duration-200
-                    text-red-600 dark:text-red-400
-                    hover:bg-red-50 dark:hover:bg-red-900/20
+                    ${isDarkMode ? 'text-red-400 hover:bg-slate-700/80 hover:text-red-300' : 'text-red-600 hover:bg-red-50'}
                   `}
                 >
                   <LogOut className="w-4 h-4" />

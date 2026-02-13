@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Moon, Sun, MessageSquarePlus } from 'lucide-react';
+import { MessageSquarePlus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { SidebarProps } from '../types/chat';
 import Image from 'next/image';
@@ -14,12 +14,11 @@ interface HistoryItem {
 }
 
 const Sidebar: React.FC<SidebarProps & { onQuickAction?: (text: string) => void; onNewChat?: () => void }> = ({ 
-  isDarkMode, 
-  toggleTheme, 
   themeClasses,
   onQuickAction,
   onNewChat
 }) => {
+  const isDarkMode = themeClasses.sidebar.includes('bg-slate-900');
   const [currentUsername, setCurrentUsername] = useState<string | null>(null);
   const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
@@ -213,42 +212,6 @@ const Sidebar: React.FC<SidebarProps & { onQuickAction?: (text: string) => void;
         </div>
       </div>
 
-      {/* Footer con Toggle Tema */}
-      <div className="border-t border-inherit flex-shrink-0">
-        <div className="p-4">
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className={`
-              w-full flex items-center justify-between px-3 py-2.5 rounded-lg 
-              transition-all duration-200 
-              ${themeClasses.themeButton}
-            `}
-            title={isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-          >
-            <span className="flex items-center gap-3">
-              {isDarkMode ? (
-                <Sun className="w-4 h-4" />
-              ) : (
-                <Moon className="w-4 h-4" />
-              )}
-              <span className="text-sm font-medium">
-                {isDarkMode ? 'Modo claro' : 'Modo oscuro'}
-              </span>
-            </span>
-            <div className={`
-              w-9 h-5 rounded-full relative transition-colors duration-200
-              ${isDarkMode ? 'bg-red-600' : 'bg-gray-300'}
-            `}>
-              <div className={`
-                absolute top-0.5 w-4 h-4 rounded-full bg-white
-                transition-transform duration-200
-                ${isDarkMode ? 'translate-x-4' : 'translate-x-0.5'}
-              `} />
-            </div>
-          </button>
-        </div>
-      </div>
     </div>
   );
 };

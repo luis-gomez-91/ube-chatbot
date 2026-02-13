@@ -302,8 +302,6 @@ export default function ChatPage() {
     <div className="flex h-screen">
       <div className='hidden lg:flex'>
         <Sidebar 
-          isDarkMode={isDarkMode} 
-          toggleTheme={toggleTheme} 
           themeClasses={themeClasses}
           onQuickAction={handleQuickAction}
           onNewChat={handleNewChat}
@@ -322,6 +320,8 @@ export default function ChatPage() {
           messagesEndRef={messagesEndRef} 
           themeClasses={themeClasses}
           onQuickAction={handleQuickAction}
+          isDarkMode={isDarkMode}
+          toggleTheme={toggleTheme}
         />
 
         <ChatInput
