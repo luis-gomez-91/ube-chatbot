@@ -46,6 +46,9 @@ export interface UseChatThemeResult {
 export interface SidebarProps {
   themeClasses: ThemeClasses;
   onQuickAction?: (text: string) => void;
+  onCollapsedChange?: (collapsed: boolean) => void;
+  onClose?: () => void;
+  forceExpanded?: boolean;
 }
 
 // Tipificación de Props para ChatArea
@@ -56,6 +59,8 @@ export interface ChatAreaProps {
   themeClasses: ThemeClasses;
   isDarkMode?: boolean;
   toggleTheme?: () => void;
+  sidebarCollapsed?: boolean;
+  onOpenMobileSidebar?: () => void;
 }
 
 // Tipificación de Props para ChatInput
@@ -65,6 +70,7 @@ export interface ChatInputProps {
   sendMessage: () => Promise<void>;
   isLoading: boolean;
   themeClasses: ThemeClasses;
+  inputRef?: React.RefObject<HTMLTextAreaElement | null>;
 }
 
 // Tipificación de Props para MessageItem

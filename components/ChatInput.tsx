@@ -35,14 +35,36 @@ declare global {
   }
 }
 
+/** Corrige transcripción de voz: "la v", "la uve" etc. → "UBE" cuando se refiere a la universidad */
+function fixUbeTranscript(text: string): string {
+  return text
+    .replace(/\bla uve\b/gi, 'UBE')
+    .replace(/\bla v\b/gi, ' la UBE ')
+    .replace(/\ben la uve\b/gi, 'en la UBE')
+    .replace(/\ben la v\b/gi, ' en la UBE ')
+    .replace(/\bde la uve\b/gi, 'de la UBE')
+    .replace(/\bde la v\b/gi, ' de la UBE ')
+    .replace(/\bel uve\b/gi, 'la UBE')
+    .replace(/\bel v\b/gi, ' la UBE ')
+    .replace(/\bube\b/g, 'UBE')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 const ChatInput: React.FC<ChatInputProps> = ({ 
   inputValue, 
   setInputValue, 
   sendMessage, 
   isLoading, 
-  themeClasses 
+  themeClasses,
+  inputRef
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const setRefs = (el: HTMLTextAreaElement | null) => {
+    (textareaRef as React.MutableRefObject<HTMLTextAreaElement | null>).current = el;
+    if (inputRef) (inputRef as React.MutableRefObject<HTMLTextAreaElement | null>).current = el;
+  };
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [voiceSupported, setVoiceSupported] = useState(false);
@@ -96,8 +118,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
         // Actualizar solo el interim, el final ya está guardado
         interimTranscriptRef.current = newInterimTranscript;
 
-        // Mostrar el texto completo (final + interim)
-        const displayText = (finalTranscriptRef.current + interimTranscriptRef.current).trim();
+        // Mostrar el texto completo (final + interim) con corrección UBE
+        const raw = (finalTranscriptRef.current + interimTranscriptRef.current).trim();
+        const displayText = fixUbeTranscript(raw);
         setInputValue(displayText);
 
         // Limpiar timeout anterior
@@ -217,15 +240,15 @@ const ChatInput: React.FC<ChatInputProps> = ({
         <div className="relative flex items-end space-x-3">
           <div className="flex-1 relative">
             <textarea
-              ref={textareaRef}
+              ref={setRefs}
               value={inputValue}
               onChange={handleInputChange}
               onKeyDown={handleKeyPress}
               placeholder={isListening ? "El texto aparecerá aquí mientras hablas..." : "Escribe tu mensaje aquí..."}
-              className={`w-full p-4 pr-24 border rounded-2xl resize-none focus:outline-none focus:ring-2 transition-all duration-200 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden ${
+              className={`w-full p-4 pr-24 border rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-slate-400/60 dark:focus:ring-slate-500 transition-all duration-200 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden ${
                 isListening 
-                  ? 'focus:ring-red-500 border-red-500 bg-red-50 dark:bg-red-900/10' 
-                  : 'focus:ring-red-500'
+                  ? 'border-red-500 bg-red-50 dark:bg-red-900/10' 
+                  : ''
               } ${themeClasses.inputArea}`}
               rows={1}
               disabled={isLoading}
@@ -239,7 +262,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                 disabled={isLoading}
                 type="button"
                 aria-label={isListening ? 'Detener reconocimiento de voz' : 'Hablar con el micrófono'}
-                className={`absolute right-14 bottom-4 p-2.5 rounded-xl transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-1 ${
+                className={`absolute right-14 bottom-4 w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-1 ${
                   isListening 
                     ? 'bg-red-500 text-white scale-110 shadow-lg ring-2 ring-red-400/50' 
                     : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-red-500 hover:text-white'
@@ -254,12 +277,12 @@ const ChatInput: React.FC<ChatInputProps> = ({
               </button>
             )}
             
-            {/* Botón de Enviar */}
+            {/* Botón de Enviar - mismo tamaño y alineación que el micrófono */}
             <button
               onClick={sendMessage}
               disabled={isLoading || !inputValue.trim()}
               type="button"
-              className={`absolute right-2 bottom-4 p-2 ${themeClasses.sendButton} rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 disabled:hover:scale-100`}
+              className={`absolute right-2 bottom-4 w-10 h-10 flex items-center justify-center ${themeClasses.sendButton} rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 disabled:hover:scale-100`}
               title="Enviar mensaje"
             >
               <Send className="w-5 h-5" />

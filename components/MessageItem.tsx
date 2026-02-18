@@ -19,9 +19,9 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, themeClasses }) => {
     >
       <div className={`flex items-start space-x-4 max-w-full ${message.sender === 'user' ? 'justify-end' : ''}`}>
         
-        {/* Ícono del Bot */}
+        {/* Ícono del Bot - oculto en móvil */}
         {message.sender === 'bot' && (
-          <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center flex-shrink-0">
+          <div className="hidden md:flex w-8 h-8 bg-gradient-to-r from-red-500 to-red-600 rounded-full items-center justify-center flex-shrink-0">
             <Bot className="w-5 h-5 text-white" />
           </div>
         )}

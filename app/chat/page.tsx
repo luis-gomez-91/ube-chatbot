@@ -31,6 +31,8 @@ export default function ChatPage() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [authProvider, setAuthProvider] = useState<string>('');
   const [chatId, setChatId] = useState<string | null>(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   
   const router = useRouter();
   const { isDarkMode, toggleTheme, themeClasses } = useChatTheme(isClient); 
@@ -61,6 +63,7 @@ export default function ChatPage() {
   };
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatInputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -79,12 +82,40 @@ export default function ChatPage() {
   }, [router]);
 
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, []);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
+
+  // Bloquear scroll del body cuando el sidebar móvil está abierto
+  useEffect(() => {
+    if (mobileSidebarOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileSidebarOpen]);
+
+  useEffect(() => {
+    if (isLoading) {
+      const t = setTimeout(scrollToBottom, 100);
+      return () => clearTimeout(t);
+    }
+  }, [isLoading, scrollToBottom]);
+
+  // Enfocar el cuadro de chat cuando la IA termina de responder
+  const prevLoadingRef = useRef(isLoading);
+  useEffect(() => {
+    if (prevLoadingRef.current && !isLoading) {
+      chatInputRef.current?.focus();
+    }
+    prevLoadingRef.current = isLoading;
+  }, [isLoading]);
 
   const getUserName = (): string => {
     if (!userData) return 'Usuario';
@@ -285,19 +316,53 @@ export default function ChatPage() {
     setMessages([]);
     setInputValue('');
     setChatId(null);  // ✅ Resetear chat_id para iniciar conversación nueva
+    setMobileSidebarOpen(false);
+  };
+
+  const handleQuickActionCloseMobile = (query: string) => {
+    handleQuickAction(query);
+    setMobileSidebarOpen(false);
   };
 
   return (
     <div className="flex h-screen">
-      <div className='hidden lg:flex'>
+      {/* Sidebar escritorio: oculto en móvil */}
+      <div className="hidden lg:flex">
         <Sidebar 
           themeClasses={themeClasses}
           onQuickAction={handleQuickAction}
           onNewChat={handleNewChat}
+          onCollapsedChange={setSidebarCollapsed}
         />
       </div>
 
-      <div className={`flex-1 flex flex-col ${themeClasses.mainArea} transition-colors duration-300`}>
+      {/* Móvil: overlay del sidebar (estilo Gemini) */}
+      {mobileSidebarOpen && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            onClick={() => setMobileSidebarOpen(false)}
+            onKeyDown={(e) => e.key === 'Escape' && setMobileSidebarOpen(false)}
+            role="button"
+            tabIndex={0}
+            aria-label="Cerrar menú"
+          />
+          <div className="fixed left-0 top-0 h-screen z-50 w-[280px] max-w-[85vw] lg:hidden shadow-xl sidebar-slide-in">
+            <div className="h-full flex flex-col min-h-0">
+              <Sidebar
+                themeClasses={themeClasses}
+                onQuickAction={handleQuickActionCloseMobile}
+                onNewChat={handleNewChat}
+                onCollapsedChange={setSidebarCollapsed}
+                onClose={() => setMobileSidebarOpen(false)}
+                forceExpanded
+              />
+            </div>
+          </div>
+        </>
+      )}
+
+      <div className={`flex-1 flex flex-col min-w-0 ${themeClasses.mainArea} transition-colors duration-300`}>
         
         <ChatArea 
           messages={messages} 
@@ -307,6 +372,8 @@ export default function ChatPage() {
           onQuickAction={handleQuickAction}
           isDarkMode={isDarkMode}
           toggleTheme={toggleTheme}
+          sidebarCollapsed={sidebarCollapsed}
+          onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
         />
 
         <ChatInput
@@ -315,6 +382,7 @@ export default function ChatPage() {
           sendMessage={sendMessage}
           isLoading={isLoading}
           themeClasses={themeClasses}
+          inputRef={chatInputRef}
         />
       </div>
     </div>

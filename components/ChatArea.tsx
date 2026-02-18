@@ -4,7 +4,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import MessageItem from './MessageItem';
-import { Bot, Sparkles, LogOut, FileText, Shield, Moon, Sun } from 'lucide-react';
+import { Bot, Sparkles, LogOut, FileText, Shield, Moon, Sun, Menu } from 'lucide-react';
 import { ChatAreaProps } from '../types/chat';
 import Image from 'next/image';
 import { getQuickActions, type QuickAction } from '../public/constants/quickActions';
@@ -22,7 +22,9 @@ const ChatArea: React.FC<ChatAreaProps & { onQuickAction?: (text: string) => voi
   themeClasses,
   onQuickAction,
   isDarkMode = false,
-  toggleTheme
+  toggleTheme,
+  sidebarCollapsed = false,
+  onOpenMobileSidebar
 }) => {
   
   const isEmpty = messages.length === 0 && !isLoading;
@@ -95,25 +97,39 @@ const ChatArea: React.FC<ChatAreaProps & { onQuickAction?: (text: string) => voi
   const photoUrl = getUserAvatar(userData, authProvider);
 
   return (
-    <div className="flex-1 overflow-y-auto scroll-smooth relative">
+    <div className={`flex-1 min-h-0 relative chat-scroll ${themeClasses.mainArea.includes('bg-slate-800') ? 'dark-scroll' : ''}`}>
       {/* Header Fixed - Top Bar con Avatar */}
       <div className={`
-        fixed top-0 right-0 left-0 lg:left-74 z-40
-        h-16 px-4 flex items-center justify-between
-        transition-colors duration-300
+        fixed top-0 right-0 left-0 z-40
+        h-16 px-4 flex items-center justify-between gap-3
+        transition-[left] duration-300 ease-in-out
         ${themeClasses.mainArea}
+        ${sidebarCollapsed ? 'lg:left-16' : 'lg:left-64'}
+        left-0
       `}>
+        {/* Móvil: botón menú para abrir sidebar */}
+        {onOpenMobileSidebar && (
+          <button
+            type="button"
+            onClick={onOpenMobileSidebar}
+            className={`lg:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors ${themeClasses.sidebarText}`}
+            aria-label="Abrir menú"
+            title="Menú"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+        )}
         {userData && (
-          <div className="hidden md:block">
-            <p className={`text-sm font-medium ${themeClasses.sidebarText}`}>
+          <div className="hidden md:block flex-1 min-w-0">
+            <p className={`text-sm font-medium truncate ${themeClasses.sidebarText}`}>
               {fullName}
             </p>
-            <p className={`${themeClasses.sidebarSecondary} text-sm`}>{userData.email}</p>
+            <p className={`${themeClasses.sidebarSecondary} text-sm truncate`}>{userData.email}</p>
           </div>
         )}
 
         {/* Avatar del usuario con Dropdown */}
-        <div className="ml-auto relative" ref={dropdownRef}>
+        <div className="ml-auto relative flex-shrink-0" ref={dropdownRef}>
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="focus:outline-none"
@@ -278,7 +294,7 @@ const ChatArea: React.FC<ChatAreaProps & { onQuickAction?: (text: string) => voi
                 <h1 className={`text-3xl md:text-4xl font-bold ${themeClasses.sidebarText}`}>
                   ¡Bienvenido{userData ? `, ${firstName}` : ''}!
                 </h1>
-                <p className={`text-base md:text-lg opacity-70 max-w-xl mx-auto ${themeClasses.textPrimary}`}>
+                <p className={`text-base md:text-sm opacity-70 max-w-xl mx-auto ${themeClasses.textPrimary}`}>
                   {authProvider === 'ube' 
                     ? 'Tu asistente personal para gestionar todo lo relacionado con tu vida universitaria en la UBE'
                     : 'Tu asistente virtual para explorar carreras, conocer precios y obtener toda la información sobre la Universidad Bolivariana del Ecuador'
@@ -309,9 +325,9 @@ const ChatArea: React.FC<ChatAreaProps & { onQuickAction?: (text: string) => voi
                 ))}
               </div>
 
-              <div className="flex items-center justify-center gap-2 mt-6 opacity-50">
-                <Sparkles className="w-4 h-4" />
-                <p className={`text-sm ${themeClasses.textPrimary}`}>Escribe tu pregunta abajo para comenzar</p>
+              <div className={`flex items-center justify-center gap-2 mt-6 opacity-50 ${themeClasses.textPrimary}`}>
+                <Sparkles className="w-4 h-4 shrink-0" />
+                <p className="text-xs">Escribe tu pregunta abajo para comenzar</p>
               </div>
             </div>
           </div>
@@ -348,26 +364,26 @@ const ChatArea: React.FC<ChatAreaProps & { onQuickAction?: (text: string) => voi
                     <div className="flex items-center space-x-2">
                       <div className="flex space-x-1">
                         <div 
-                          className="w-2.5 h-2.5 bg-red-600 rounded-full animate-bounce" 
+                          className={`w-2.5 h-2.5 rounded-full animate-bounce ${isDarkMode ? 'bg-red-400' : 'bg-red-600'}`}
                           style={{ animationDelay: '0ms', animationDuration: '1s' }}
                         ></div>
                         <div 
-                          className="w-2.5 h-2.5 bg-red-600 rounded-full animate-bounce" 
+                          className={`w-2.5 h-2.5 rounded-full animate-bounce ${isDarkMode ? 'bg-red-400' : 'bg-red-600'}`}
                           style={{ animationDelay: '150ms', animationDuration: '1s' }}
                         ></div>
                         <div 
-                          className="w-2.5 h-2.5 bg-red-600 rounded-full animate-bounce" 
+                          className={`w-2.5 h-2.5 rounded-full animate-bounce ${isDarkMode ? 'bg-red-400' : 'bg-red-600'}`}
                           style={{ animationDelay: '300ms', animationDuration: '1s' }}
                         ></div>
                       </div>
-                      <span className="text-sm opacity-60 animate-pulse">
+                      <span className={`text-sm animate-pulse ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
                         Pensando...
                       </span>
                     </div>
 
                     <div className="mt-3 space-y-2">
-                      <div className={`h-2 rounded-full animate-pulse ${themeClasses.sidebarText} opacity-20 w-3/4`}></div>
-                      <div className={`h-2 rounded-full animate-pulse ${themeClasses.sidebarText} opacity-20 w-1/2`}></div>
+                      <div className={`h-2 rounded-full animate-pulse w-3/4 ${isDarkMode ? 'bg-slate-500/60' : 'bg-slate-300'}`}></div>
+                      <div className={`h-2 rounded-full animate-pulse w-1/2 ${isDarkMode ? 'bg-slate-500/50' : 'bg-slate-300'}`}></div>
                     </div>
                   </div>
                 </div>

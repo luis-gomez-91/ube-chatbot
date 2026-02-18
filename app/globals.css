@@ -51,6 +51,40 @@
   .scrollbar-thin::-webkit-scrollbar-thumb {
     @apply bg-gray-400 rounded hover:bg-gray-500;
   }
+
+  /* Scroll del área de chat: suave, barra fina, modo oscuro */
+  .chat-scroll {
+    overflow-x: hidden;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(148 163 184) rgb(241 245 249);
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .chat-scroll::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .chat-scroll::-webkit-scrollbar-track {
+    @apply bg-slate-100 rounded-full;
+  }
+  
+  .chat-scroll::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 rounded-full hover:bg-slate-400 active:bg-slate-500;
+  }
+  
+  .chat-scroll.dark-scroll::-webkit-scrollbar-track {
+    @apply bg-slate-800;
+  }
+  
+  .chat-scroll.dark-scroll::-webkit-scrollbar-thumb {
+    @apply bg-slate-600 hover:bg-slate-500;
+  }
+  
+  .chat-scroll.dark-scroll {
+    scrollbar-color: rgb(71 85 105) rgb(30 41 59);
+  }
 }
 
 @keyframes slideIn {
@@ -62,6 +96,20 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Sidebar móvil: entra de izquierda a derecha */
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.sidebar-slide-in {
+  animation: slideInFromLeft 0.3s ease-out forwards;
 }
 
 @keyframes typing {
