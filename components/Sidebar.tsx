@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { BadgePlus, Menu, CirclePlus, Search, X } from 'lucide-react';
+import { BadgePlus, Menu, Search, X } from 'lucide-react';
 import { SidebarProps } from '../types/chat';
 import { getQuickActions, type QuickAction } from '../public/constants/quickActions';
 
